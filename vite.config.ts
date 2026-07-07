@@ -2,7 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+// GitHub Pages(プロジェクトページ)で配信するため、ビルド時のみ base をリポジトリ名にする。
+// 開発サーバー(command === 'serve')ではルート '/' のまま。
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/anatomy-3d-viewer/' : '/',
   plugins: [react()],
   server: {
     host: '127.0.0.1',
@@ -21,4 +24,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
