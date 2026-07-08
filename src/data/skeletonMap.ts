@@ -17,7 +17,8 @@ export interface SkelMatch {
  * 判定順は「足→手」「具体→総称」の順(誤マッチ防止)。
  */
 export function matchPartId(rawName: string): SkelMatch | null {
-  const n = rawName.toLowerCase();
+  // Three.js は glTF ノード名の空白等を '_' に置換するため、'_' を空白へ戻して判定する
+  const n = rawName.toLowerCase().replace(/_/g, ' ');
 
   // 胸郭(肋骨・肋軟骨・胸骨) — 正中部位 ribs に集約
   if (/costal cart|sternum|manubrium|\brib\b|rib \(/.test(n)) return { base: 'ribs', paired: false };

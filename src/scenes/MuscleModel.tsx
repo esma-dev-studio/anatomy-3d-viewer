@@ -25,11 +25,23 @@ type Fit = { scale: number; position: [number, number, number]; rotationY: numbe
 interface Processed {
   root: THREE.Group;
   meshesByPart: Map<string, THREE.Mesh[]>;
+  looseMeshes: THREE.Mesh[];
   anchors: Record<string, [number, number, number]>;
 }
 
 function isMeshObj(o: THREE.Object3D): o is THREE.Mesh {
   return (o as THREE.Mesh).isMesh === true;
+}
+
+/** メッシュから祖先すべての名前を連結(グループ名も筋名も拾える) */
+function ancestryText(mesh: THREE.Object3D): string {
+  const names: string[] = [];
+  let n: THREE.Object3D | null = mesh;
+  while (n) {
+    if (n.name) names.push(n.name);
+    n = n.parent;
+  }
+  return names.join(' | ');
 }
 
 function process(scene: THREE.Object3D, fit: Fit): Processed {
@@ -49,6 +61,7 @@ function process(scene: THREE.Object3D, fit: Fit): Processed {
   root.add(mirror);
 
   const meshesByPart = new Map<string, THREE.Mesh[]>();
+  const looseMeshes: THREE.Mesh[] = [];
 
   root.traverse((obj) => {
     if (!isMeshObj(obj)) return;
@@ -60,9 +73,11 @@ function process(scene: THREE.Object3D, fit: Fit): Processed {
       metalness: 0.02,
     });
 
-    const group = mesh.parent?.name || '';
-    const base = matchMusclePartId(mesh.name || '', group);
-    if (!base) return;
+    const base = matchMusclePartId(ancestryText(mesh));
+    if (!base) {
+      looseMeshes.push(mesh);
+      return;
+    }
     const isMirror = obj.userData.__mirror === true;
     const partId = `${base}_${isMirror ? 'l' : 'r'}`;
     mesh.userData.partId = partId;
@@ -87,7 +102,7 @@ function process(scene: THREE.Object3D, fit: Fit): Processed {
     ];
   }
 
-  return { root, meshesByPart, anchors };
+  return { root, meshesByPart, looseMeshes, anchors };
 }
 
 interface AppearanceState {
@@ -132,6 +147,8 @@ function applyAppearance(p: Processed, s: AppearanceState) {
       }
     }
   }
+  // 部位に未対応のメッシュもレイヤーのON/OFFに従わせる(取りこぼし防止)
+  for (const mesh of p.looseMeshes) mesh.visible = s.layerOn && !isolate;
 }
 
 export function MuscleModel() {

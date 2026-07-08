@@ -9,7 +9,7 @@ export default defineConfig(({ command }) => ({
   plugins: [react()],
   server: {
     host: '127.0.0.1',
-    port: 5173,
+    port: 5180,
   },
   build: {
     chunkSizeWarningLimit: 1200,

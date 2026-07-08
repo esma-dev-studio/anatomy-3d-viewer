@@ -28,6 +28,7 @@ type Fit = { scale: number; position: [number, number, number] };
 interface Processed {
   root: THREE.Group;
   meshesByPart: Map<string, THREE.Mesh[]>;
+  looseMeshes: THREE.Mesh[];
   fit: Fit;
   anchors: Record<string, [number, number, number]>;
 }
@@ -50,11 +51,15 @@ function process(scene: THREE.Object3D): Processed {
   const root = scene.clone(true) as THREE.Group;
 
   const meshesByPart = new Map<string, THREE.Mesh[]>();
+  const looseMeshes: THREE.Mesh[] = [];
   root.traverse((obj) => {
     if (!isMeshObj(obj)) return;
     const mesh = obj;
     const organId = organIdOf(mesh);
-    if (!organId) return;
+    if (!organId) {
+      looseMeshes.push(mesh);
+      return;
+    }
     mesh.userData.partId = organId;
     mesh.material = new THREE.MeshStandardMaterial({
       color: new THREE.Color(ORGAN_COLORS[organId] ?? '#c98a6a'),
@@ -94,7 +99,7 @@ function process(scene: THREE.Object3D): Processed {
     ];
   }
 
-  return { root, meshesByPart, fit, anchors };
+  return { root, meshesByPart, looseMeshes, fit, anchors };
 }
 
 interface AppearanceState {
@@ -139,6 +144,7 @@ function applyAppearance(p: Processed, s: AppearanceState) {
       }
     }
   }
+  for (const mesh of p.looseMeshes) mesh.visible = s.layerOn && !isolate;
 }
 
 export function OrganModel() {

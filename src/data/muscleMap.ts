@@ -7,23 +7,25 @@
 import type { Region } from '../types/anatomy';
 
 /**
- * 筋メッシュ(名前 + 親グループ名)を筋部位ベースIDへ対応づける。
+ * 筋メッシュの「祖先すべての名前を連結した文字列」を筋部位ベースIDへ対応づける。
+ * (筋名 + グループ名の両方が含まれる。Three.js が複数プリミティブのノードを
+ *  サブグループに分けても、祖先をたどれば必ずグループ名も筋名も拾えるため堅牢)
  * グループ: "Muscles"(脚) / "Arm - muscles" / "Forearm - muscles" /
  *           "Hand and wrist - muscles" / "Pectoral girdle - muscles"
  */
-export function matchMusclePartId(name: string, group: string): string | null {
-  const n = name.toLowerCase();
-  const g = (group || '').toLowerCase();
+export function matchMusclePartId(text: string): string | null {
+  // Three.js は glTF ノード名の空白等を '_' に置換するため、'_' を空白へ戻して判定する
+  const n = text.toLowerCase().replace(/_/g, ' ');
 
-  // --- 上肢・肩(グループで判定) ---
-  if (g.includes('hand and wrist')) return 'm_hand';
-  if (g.includes('forearm')) return 'm_forearm';
-  if (g.includes('arm - muscles')) {
+  // --- 上肢・肩(グループ名で判定) ---
+  if (n.includes('hand and wrist')) return 'm_hand';
+  if (n.includes('forearm')) return 'm_forearm';
+  if (n.includes('arm - muscles')) {
     if (/triceps|anconeus/.test(n)) return 'm_triceps';
     if (/biceps/.test(n)) return 'm_biceps';
     return 'm_brachialis'; // brachialis, coracobrachialis
   }
-  if (g.includes('pectoral girdle')) {
+  if (n.includes('pectoral girdle')) {
     if (/deltoid/.test(n)) return 'm_deltoid';
     if (/pectoralis/.test(n)) return 'm_pectoralis';
     if (/trapezius/.test(n)) return 'm_trapezius';

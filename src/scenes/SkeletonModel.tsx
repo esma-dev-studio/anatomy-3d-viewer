@@ -29,6 +29,17 @@ function isMeshObj(o: THREE.Object3D): o is THREE.Mesh {
   return (o as THREE.Mesh).isMesh === true;
 }
 
+/** メッシュから祖先すべての名前を連結(複数プリミティブでノードが入れ子でも骨名を拾える) */
+function ancestryText(mesh: THREE.Object3D): string {
+  const names: string[] = [];
+  let n: THREE.Object3D | null = mesh;
+  while (n) {
+    if (n.name) names.push(n.name);
+    n = n.parent;
+  }
+  return names.join(' | ');
+}
+
 /** GLBシーンを複製し、ミラー・部位タグ付け・正規化・アンカー算出を行う。 */
 function process(scene: THREE.Object3D): Processed {
   const root = scene.clone(true) as THREE.Group;
@@ -60,7 +71,7 @@ function process(scene: THREE.Object3D): Processed {
       ? mesh.material.map((m) => m.clone())
       : mesh.material.clone();
 
-    const matched = matchPartId(mesh.name || '');
+    const matched = matchPartId(ancestryText(mesh));
     if (!matched) {
       looseMeshes.push(mesh);
       return;
