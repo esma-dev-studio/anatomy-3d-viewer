@@ -519,6 +519,35 @@ button {
   z-index: 1;
 }
 
+/* モデル読み込みオーバーレイ */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-dim);
+  font-size: 13px;
+  background: rgba(8, 12, 20, 0.55);
+  backdrop-filter: blur(2px);
+}
+.loading-overlay__spinner {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid rgba(120, 150, 190, 0.25);
+  border-top-color: var(--accent);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ビュー操作バー */
 .viewbar {
   position: absolute;

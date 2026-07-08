@@ -21,7 +21,7 @@ export const CATEGORIES: Record<Category, CategoryMeta> = {
     nameJa: '皮膚 / 外観',
     nameEn: 'Skin',
     color: '#d8b89a',
-    defaultVisible: true,
+    defaultVisible: false,
     order: 0,
   },
   skeleton: {

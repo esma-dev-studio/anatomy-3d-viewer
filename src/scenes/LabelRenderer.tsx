@@ -1,11 +1,14 @@
 // ============================================================================
 // 部位ラベルの描画 (drei Html)
-// 表示中かつラベルモード条件を満たす部位にのみ名称ラベルを出す。
+//  - 実写骨格の部位は読み込み後に算出したアンカー(skeletonAnchors)を使う
+//  - 選択中の部位はラベルモードに関わらず常に表示
+//  - 既定は「なし」(多数のラベルの重なりを避ける)
 // ============================================================================
 import { Html } from '@react-three/drei';
 import { anatomyParts } from '../data/anatomyParts';
 import { labelAnchorOf } from '../utils/geometry';
 import { useAnatomyStore } from '../store/useAnatomyStore';
+import type { AnatomyPart } from '../types/anatomy';
 
 export function LabelRenderer() {
   const labelMode = useAnatomyStore((s) => s.labelMode);
@@ -13,15 +16,22 @@ export function LabelRenderer() {
   const partVisibility = useAnatomyStore((s) => s.partVisibility);
   const displayMode = useAnatomyStore((s) => s.displayMode);
   const selectedId = useAnatomyStore((s) => s.selectedPartId);
+  const skeletonAnchors = useAnatomyStore((s) => s.skeletonAnchors);
   const selectPart = useAnatomyStore((s) => s.selectPart);
 
-  if (labelMode === 'none') return null;
+  const anchorFor = (p: AnatomyPart): [number, number, number] | null => {
+    if (p.category === 'skeleton') return skeletonAnchors[p.id] ?? null;
+    return labelAnchorOf(p);
+  };
 
   const isolateActive = displayMode === 'isolate' && selectedId !== null;
 
   const visibleParts = anatomyParts.filter((p) => {
     if (!layerVisibility[p.category] || !partVisibility[p.id]) return false;
     if (isolateActive && p.id !== selectedId) return false;
+    if (!anchorFor(p)) return false;
+    if (p.id === selectedId) return true; // 選択部位は常に表示
+    if (labelMode === 'none') return false;
     if (labelMode === 'major' && !p.isMajorPart) return false;
     return true;
   });
@@ -29,7 +39,7 @@ export function LabelRenderer() {
   return (
     <>
       {visibleParts.map((p) => {
-        const anchor = labelAnchorOf(p);
+        const anchor = anchorFor(p)!;
         const isSel = p.id === selectedId;
         return (
           <Html

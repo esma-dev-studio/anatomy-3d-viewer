@@ -298,6 +298,72 @@ const boneParts: AnatomyPart[] = [
       pieces: [{ shape: 'cylinder', args: [0.012, 0.014, 0.32], position: [-0.118, -0.7, -0.004] }],
     }),
   ),
+  // --- 実写骨格モデルに含まれる追加の骨(プリミティブ形状は持たず、実メッシュが描画) ---
+  ...makePair(
+    P({
+      id: 'clavicle',
+      nameJa: '鎖骨',
+      nameEn: 'Clavicle',
+      category: 'skeleton',
+      subcategory: '上肢帯',
+      region: 'chest',
+      description: '胸骨と肩甲骨をつなぐS字状の骨。',
+      function: '肩を体幹につなぎ、上肢の可動域を確保する。',
+      pieces: [],
+    }),
+  ),
+  ...makePair(
+    P({
+      id: 'scapula',
+      nameJa: '肩甲骨',
+      nameEn: 'Scapula',
+      category: 'skeleton',
+      subcategory: '上肢帯',
+      region: 'back',
+      description: '背側にある逆三角形の平たい骨(肩甲骨)。',
+      function: '肩関節の受け皿、多くの上肢筋の付着部。',
+      pieces: [],
+    }),
+  ),
+  ...makePair(
+    P({
+      id: 'hand',
+      nameJa: '手の骨',
+      nameEn: 'Bones of the Hand',
+      category: 'skeleton',
+      subcategory: '上肢骨',
+      region: 'arm',
+      description: '手根骨・中手骨・指骨の総称。',
+      function: '手の複雑で精密な運動を可能にする。',
+      pieces: [],
+    }),
+  ),
+  ...makePair(
+    P({
+      id: 'patella',
+      nameJa: '膝蓋骨',
+      nameEn: 'Patella',
+      category: 'skeleton',
+      subcategory: '下肢骨',
+      region: 'leg',
+      description: '膝の前面にある種子骨(膝の皿)。',
+      function: '膝の伸展効率を高め、関節を保護する。',
+      pieces: [],
+    }),
+  ),
+  ...makePair(
+    P({
+      id: 'foot',
+      nameJa: '足の骨',
+      nameEn: 'Bones of the Foot',
+      category: 'skeleton',
+      subcategory: '下肢骨',
+      region: 'leg',
+      description: '足根骨・中足骨・趾骨の総称。',
+      function: '体重を支え、歩行の踏み出しを担う。',
+      pieces: [],
+    }),
+  ),
 ];
 
 // ============================================================================

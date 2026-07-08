@@ -3,6 +3,7 @@
 // モデル・ラベル・カメラ制御を束ねる。
 // 太陽系3Dマップのように、モデルが暗い空間に浮かぶ見せ方にする。
 // ============================================================================
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stars, Grid } from '@react-three/drei';
 import { AnatomyModel } from './AnatomyModel';
@@ -46,7 +47,9 @@ export function AnatomyScene() {
       <directionalLight position={[3, 5, 4]} intensity={1.15} />
       <directionalLight position={[-4, 2, -3]} intensity={0.5} color="#bcd3ff" />
 
-      <AnatomyModel />
+      <Suspense fallback={null}>
+        <AnatomyModel />
+      </Suspense>
       <LabelRenderer />
       <CameraController />
     </Canvas>

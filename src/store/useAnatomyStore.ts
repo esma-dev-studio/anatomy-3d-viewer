@@ -45,6 +45,9 @@ export interface AnatomyState {
   displayMode: DisplayMode;
   // --- カメラ命令(nonce で再発火) ---
   cameraCommand: { cmd: CameraCommand; nonce: number } | null;
+  // --- 実写骨格モデルの部位アンカー(ラベル/フォーカス位置。読み込み後に設定) ---
+  skeletonAnchors: Record<string, [number, number, number]>;
+  skeletonReady: boolean;
 
   // --- アクション ---
   toggleLayer: (cat: Category) => void;
@@ -65,6 +68,8 @@ export interface AnatomyState {
   resetView: () => void;
   zoomBy: (factor: number) => void;
   resetAll: () => void;
+  // 実写骨格
+  setSkeletonAnchors: (anchors: Record<string, [number, number, number]>) => void;
 }
 
 let cameraNonce = 0;
@@ -81,9 +86,11 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
   categoryFilter: 'all',
   regionFilter: 'all',
   searchQuery: '',
-  labelMode: 'major',
+  labelMode: 'none',
   displayMode: 'normal',
   cameraCommand: null,
+  skeletonAnchors: {},
+  skeletonReady: false,
 
   toggleLayer: (cat) =>
     set((s) => ({
@@ -125,13 +132,14 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
   focusPart: (id) => {
     const part = partsById[id];
     if (!part) return;
+    // 実写骨格の部位はロード時に計算した実メッシュのアンカーを優先する。
+    const anchor = get().skeletonAnchors[id];
+    const target = anchor ?? focusPointOf(part);
     // 部位の大きさに応じて寄り(フレーミング)を調整する。惑星クリックのように、
     // 小さい部位は近く、大きい部位は引いて全体が収まる距離にする。
     const r = partRadius(part);
-    const distance = Math.min(2.4, Math.max(0.55, r * 3.4 + 0.2));
-    set({
-      cameraCommand: nextCamera({ type: 'focus', target: focusPointOf(part), distance }),
-    });
+    const distance = Math.min(2.4, Math.max(0.6, r * 3.4 + 0.35));
+    set({ cameraCommand: nextCamera({ type: 'focus', target, distance }) });
   },
 
   resetView: () => set({ cameraCommand: nextCamera({ type: 'reset' }) }),
@@ -147,9 +155,11 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
       categoryFilter: 'all',
       regionFilter: 'all',
       searchQuery: '',
-      labelMode: 'major',
+      labelMode: 'none',
       displayMode: 'normal',
     }),
+
+  setSkeletonAnchors: (anchors) => set({ skeletonAnchors: anchors, skeletonReady: true }),
 }));
 
 // ---------------------------------------------------------------------------

@@ -52,6 +52,9 @@ export function Sidebar() {
         <p className="sidebar__note">
           ※ 本アプリは学習・理解支援用です。診断・医療目的には使用できません。
         </p>
+        <p className="sidebar__note">
+          骨格モデル: BodyParts3D（© DBCLS） / Open3DModel（LUMC）由来・CC&nbsp;BY-SA。
+        </p>
       </footer>
     </aside>
   );
