@@ -14,6 +14,7 @@ import type {
 } from '../types/anatomy';
 import { CATEGORIES } from './categories';
 import { MUSCLE_DEFS } from './muscleMap';
+import { ORGAN_DEFS } from './organMap';
 import { linspace, makePair } from '../utils/geometry';
 
 // --- 部位ビルダー(既定値の補完) --------------------------------------------
@@ -388,66 +389,27 @@ const muscleParts: AnatomyPart[] = MUSCLE_DEFS.flatMap((d) =>
 );
 
 // ============================================================================
-// 内臓
+// 内臓(実写内臓モデル organs.glb に対応。胃のみ当面プリミティブ)
 // ============================================================================
+const realOrganParts: AnatomyPart[] = ORGAN_DEFS.map((d) =>
+  P({
+    id: d.id,
+    nameJa: d.nameJa,
+    nameEn: d.nameEn,
+    category: 'organ',
+    subcategory: d.subcategory,
+    region: d.region,
+    side: d.side,
+    description: d.description,
+    function: d.function,
+    isMajorPart: d.isMajorPart,
+    color: d.color,
+    pieces: [],
+  }),
+);
 const organParts: AnatomyPart[] = [
-  P({
-    id: 'brain',
-    nameJa: '脳',
-    nameEn: 'Brain',
-    category: 'organ',
-    subcategory: '神経系',
-    region: 'head',
-    description: '頭蓋内にある中枢神経。大脳・小脳・脳幹からなる。',
-    function: '思考・感覚・運動・自律機能の統合制御。',
-    isMajorPart: true,
-    color: '#e59ab0',
-    labelAnchor: [0, 0.92, 0],
-    pieces: [{ shape: 'sphere', args: [0.082], position: [0, 0.83, 0.0], scale: [1.0, 0.9, 1.05] }],
-  }),
-  P({
-    id: 'heart',
-    nameJa: '心臓',
-    nameEn: 'Heart',
-    category: 'organ',
-    subcategory: '循環器系',
-    region: 'chest',
-    description: '胸腔中央やや左にある筋性の臓器。',
-    function: '全身への血液の拍出(ポンプ機能)。',
-    isMajorPart: true,
-    color: '#b8323a',
-    labelAnchor: [0.02, 0.44, 0.1],
-    pieces: [{ shape: 'sphere', args: [0.05], position: [0.02, 0.35, 0.045], scale: [1.0, 1.2, 0.9] }],
-  }),
-  ...makePair(
-    P({
-      id: 'lung',
-      nameJa: '肺',
-      nameEn: 'Lung',
-      category: 'organ',
-      subcategory: '呼吸器系',
-      region: 'chest',
-      description: '胸腔内で心臓を挟む左右一対の臓器。',
-      function: 'ガス交換(酸素の取り込みと二酸化炭素の排出)。',
-      isMajorPart: true,
-      color: '#d98c82',
-      pieces: [{ shape: 'sphere', args: [0.072], position: [-0.062, 0.37, 0.01], scale: [0.85, 1.35, 0.72] }],
-    }),
-  ),
-  P({
-    id: 'liver',
-    nameJa: '肝臓',
-    nameEn: 'Liver',
-    category: 'organ',
-    subcategory: '消化器系',
-    region: 'abdomen',
-    description: '右上腹部にある人体最大の内臓。',
-    function: '代謝・解毒・胆汁の生成、栄養の貯蔵。',
-    isMajorPart: true,
-    color: '#7c4a3c',
-    labelAnchor: [-0.05, 0.24, 0.12],
-    pieces: [{ shape: 'sphere', args: [0.07], position: [-0.055, 0.17, 0.05], scale: [1.5, 0.75, 0.8] }],
-  }),
+  ...realOrganParts,
+  // 胃は実写内臓モデルに含まれないため、当面プリミティブで表示
   P({
     id: 'stomach',
     nameJa: '胃',
@@ -461,83 +423,6 @@ const organParts: AnatomyPart[] = [
     color: '#cf9a5a',
     labelAnchor: [0.06, 0.26, 0.1],
     pieces: [{ shape: 'sphere', args: [0.05], position: [0.06, 0.19, 0.04], scale: [1.15, 1.05, 0.75] }],
-  }),
-  P({
-    id: 'pancreas',
-    nameJa: '膵臓',
-    nameEn: 'Pancreas',
-    category: 'organ',
-    subcategory: '消化器系',
-    region: 'abdomen',
-    description: '胃の後方に位置する細長い臓器。',
-    function: '消化酵素とインスリンなどのホルモン分泌。',
-    color: '#d7b45a',
-    labelAnchor: [0, 0.135, 0.08],
-    pieces: [{ shape: 'capsule', args: [0.016, 0.09], position: [0.0, 0.135, 0.0], rotation: [0, 0, 0.35] }],
-  }),
-  ...makePair(
-    P({
-      id: 'kidney',
-      nameJa: '腎臓',
-      nameEn: 'Kidney',
-      category: 'organ',
-      subcategory: '泌尿器系',
-      region: 'abdomen',
-      description: '背側腹部にある左右一対のソラマメ状の臓器。',
-      function: '血液の濾過と尿の生成、体液バランスの調節。',
-      isMajorPart: true,
-      color: '#9c5040',
-      pieces: [{ shape: 'sphere', args: [0.028], position: [-0.06, 0.11, -0.055], scale: [0.85, 1.35, 0.72] }],
-    }),
-  ),
-  P({
-    id: 'small_intestine',
-    nameJa: '小腸',
-    nameEn: 'Small Intestine',
-    category: 'organ',
-    subcategory: '消化器系',
-    region: 'abdomen',
-    description: '腹部中央でとぐろを巻く長い管状の器官。',
-    function: '栄養素の消化と吸収の主要な場。',
-    isMajorPart: true,
-    color: '#e0a878',
-    labelAnchor: [0, 0.02, 0.13],
-    pieces: [
-      { shape: 'sphere', args: [0.085], position: [0, 0.0, 0.03], scale: [1.05, 0.85, 0.6] },
-      { shape: 'torus', args: [0.05, 0.018], position: [0, 0.02, 0.05] },
-      { shape: 'torus', args: [0.04, 0.016], position: [0.01, -0.035, 0.05] },
-    ],
-  }),
-  P({
-    id: 'large_intestine',
-    nameJa: '大腸',
-    nameEn: 'Large Intestine',
-    category: 'organ',
-    subcategory: '消化器系',
-    region: 'abdomen',
-    description: '小腸を囲む太い管。上行・横行・下行結腸などからなる。',
-    function: '水分の吸収と便の形成。',
-    isMajorPart: true,
-    color: '#c07a4a',
-    labelAnchor: [0, 0.15, 0.13],
-    pieces: [
-      { shape: 'capsule', args: [0.024, 0.18], position: [-0.085, 0.02, 0.045] }, // 上行結腸
-      { shape: 'capsule', args: [0.024, 0.18], position: [0.085, 0.02, 0.045] }, // 下行結腸
-      { shape: 'capsule', args: [0.024, 0.15], position: [0, 0.13, 0.045], rotation: [0, 0, Math.PI / 2] }, // 横行結腸
-    ],
-  }),
-  P({
-    id: 'bladder',
-    nameJa: '膀胱',
-    nameEn: 'Urinary Bladder',
-    category: 'organ',
-    subcategory: '泌尿器系',
-    region: 'pelvis',
-    description: '骨盤内にある尿をためる袋状の臓器。',
-    function: '尿の一時貯留と排出。',
-    color: '#cabf5e',
-    labelAnchor: [0, -0.1, 0.1],
-    pieces: [{ shape: 'sphere', args: [0.035], position: [0, -0.12, 0.05], scale: [1.0, 0.9, 0.9] }],
   }),
 ];
 

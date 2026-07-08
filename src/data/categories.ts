@@ -45,7 +45,7 @@ export const CATEGORIES: Record<Category, CategoryMeta> = {
     nameJa: '内臓',
     nameEn: 'Organs',
     color: '#d98c82',
-    defaultVisible: false,
+    defaultVisible: true,
     order: 3,
   },
 };
