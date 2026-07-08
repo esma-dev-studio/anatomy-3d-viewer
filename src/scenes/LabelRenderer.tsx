@@ -16,12 +16,14 @@ export function LabelRenderer() {
   const partVisibility = useAnatomyStore((s) => s.partVisibility);
   const displayMode = useAnatomyStore((s) => s.displayMode);
   const selectedId = useAnatomyStore((s) => s.selectedPartId);
-  const skeletonAnchors = useAnatomyStore((s) => s.skeletonAnchors);
+  const partAnchors = useAnatomyStore((s) => s.partAnchors);
   const selectPart = useAnatomyStore((s) => s.selectPart);
 
   const anchorFor = (p: AnatomyPart): [number, number, number] | null => {
-    if (p.category === 'skeleton') return skeletonAnchors[p.id] ?? null;
-    return labelAnchorOf(p);
+    // 実写モデル(骨格・筋肉)は読み込み後に算出したアンカーを使う
+    if (partAnchors[p.id]) return partAnchors[p.id];
+    // プリミティブ部位(内臓・皮膚)は形状から算出。実写部位で未登録なら非表示。
+    return p.pieces.length > 0 ? labelAnchorOf(p) : null;
   };
 
   const isolateActive = displayMode === 'isolate' && selectedId !== null;

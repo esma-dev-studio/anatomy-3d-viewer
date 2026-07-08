@@ -13,6 +13,7 @@ import type {
   Side,
 } from '../types/anatomy';
 import { CATEGORIES } from './categories';
+import { MUSCLE_DEFS } from './muscleMap';
 import { linspace, makePair } from '../utils/geometry';
 
 // --- 部位ビルダー(既定値の補完) --------------------------------------------
@@ -59,7 +60,6 @@ function P(input: PartInput): AnatomyPart {
 
 // --- 色パレット(骨は既定のカテゴリ色を使用) --------------------------------
 const MUSCLE = '#c0414f';
-const MUSCLE_DEEP = '#a5333f';
 
 // ============================================================================
 // 生成ピース(椎骨・肋骨・腹直筋)
@@ -367,213 +367,25 @@ const boneParts: AnatomyPart[] = [
 ];
 
 // ============================================================================
-// 筋肉
+// 筋肉(実写筋肉モデル muscles.glb に対応。プリミティブ形状は持たない)
 // ============================================================================
-const muscleParts: AnatomyPart[] = [
-  ...makePair(
+const muscleParts: AnatomyPart[] = MUSCLE_DEFS.flatMap((d) =>
+  makePair(
     P({
-      id: 'sternocleidomastoid',
-      nameJa: '胸鎖乳突筋',
-      nameEn: 'Sternocleidomastoid',
+      id: d.base,
+      nameJa: d.nameJa,
+      nameEn: d.nameEn,
       category: 'muscle',
-      subcategory: '頸部の筋',
-      region: 'neck',
-      description: '耳の後ろから鎖骨・胸骨へ走る首の筋。',
-      function: '頭を回旋・側屈させる。',
+      subcategory: d.subcategory,
+      region: d.region,
+      description: d.description,
+      function: d.function,
+      isMajorPart: d.isMajorPart,
       color: MUSCLE,
-      pieces: [{ shape: 'capsule', args: [0.016, 0.09], position: [-0.045, 0.6, 0.045], rotation: [0.15, 0, 0.28] }],
+      pieces: [],
     }),
   ),
-  P({
-    id: 'trapezius',
-    nameJa: '僧帽筋',
-    nameEn: 'Trapezius',
-    category: 'muscle',
-    subcategory: '背部の筋',
-    region: 'back',
-    description: '首から背中上部に広がる大きな菱形の筋。',
-    function: '肩甲骨の挙上・内転、頭頸部の支持。',
-    isMajorPart: true,
-    color: MUSCLE_DEEP,
-    labelAnchor: [0, 0.5, -0.12],
-    pieces: [{ shape: 'sphere', args: [0.13], position: [0, 0.47, -0.05], scale: [1.5, 1.0, 0.42] }],
-  }),
-  ...makePair(
-    P({
-      id: 'deltoid',
-      nameJa: '三角筋',
-      nameEn: 'Deltoid',
-      category: 'muscle',
-      subcategory: '肩の筋',
-      region: 'arm',
-      description: '肩を覆う三角形の筋。',
-      function: '腕の外転・屈曲・伸展。',
-      isMajorPart: true,
-      color: MUSCLE,
-      pieces: [{ shape: 'sphere', args: [0.072], position: [-0.19, 0.475, 0.0], scale: [1.0, 1.05, 1.0] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'pectoralis_major',
-      nameJa: '大胸筋',
-      nameEn: 'Pectoralis Major',
-      category: 'muscle',
-      subcategory: '胸部の筋',
-      region: 'chest',
-      description: '胸の前面を覆う扇状の大きな筋。',
-      function: '腕を前方・内側へ動かす(水平内転)。',
-      isMajorPart: true,
-      color: MUSCLE,
-      pieces: [{ shape: 'sphere', args: [0.075], position: [-0.075, 0.37, 0.085], scale: [1.15, 0.85, 0.55] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'biceps_brachii',
-      nameJa: '上腕二頭筋',
-      nameEn: 'Biceps Brachii',
-      category: 'muscle',
-      subcategory: '上腕の筋',
-      region: 'arm',
-      description: '上腕前面のいわゆる「力こぶ」の筋。',
-      function: '肘関節の屈曲、前腕の回外。',
-      isMajorPart: true,
-      color: MUSCLE,
-      pieces: [{ shape: 'capsule', args: [0.032, 0.16], position: [-0.205, 0.33, 0.035] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'triceps_brachii',
-      nameJa: '上腕三頭筋',
-      nameEn: 'Triceps Brachii',
-      category: 'muscle',
-      subcategory: '上腕の筋',
-      region: 'arm',
-      description: '上腕後面の筋。',
-      function: '肘関節の伸展。',
-      color: MUSCLE_DEEP,
-      pieces: [{ shape: 'capsule', args: [0.033, 0.17], position: [-0.2, 0.33, -0.03] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'latissimus_dorsi',
-      nameJa: '広背筋',
-      nameEn: 'Latissimus Dorsi',
-      category: 'muscle',
-      subcategory: '背部の筋',
-      region: 'back',
-      description: '背中の下部を広く覆う筋。',
-      function: '腕を後方・下方へ引く(内転・伸展)。',
-      isMajorPart: true,
-      color: MUSCLE_DEEP,
-      pieces: [{ shape: 'sphere', args: [0.11], position: [-0.085, 0.27, -0.07], scale: [1.05, 1.35, 0.4] }],
-    }),
-  ),
-  P({
-    id: 'rectus_abdominis',
-    nameJa: '腹直筋',
-    nameEn: 'Rectus Abdominis',
-    category: 'muscle',
-    subcategory: '腹部の筋',
-    region: 'abdomen',
-    description: '腹部前面の筋。いわゆる「腹筋(シックスパック)」。',
-    function: '体幹の屈曲、腹圧の維持。',
-    isMajorPart: true,
-    color: MUSCLE,
-    labelAnchor: [0, 0.13, 0.14],
-    pieces: sixPackPieces,
-  }),
-  ...makePair(
-    P({
-      id: 'external_oblique',
-      nameJa: '外腹斜筋',
-      nameEn: 'External Oblique',
-      category: 'muscle',
-      subcategory: '腹部の筋',
-      region: 'abdomen',
-      description: '腹部側面の斜めに走る筋。',
-      function: '体幹の回旋・側屈、腹圧の維持。',
-      color: MUSCLE,
-      pieces: [{ shape: 'sphere', args: [0.06], position: [-0.115, 0.13, 0.05], scale: [0.7, 1.4, 0.95] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'gluteus_maximus',
-      nameJa: '大臀筋',
-      nameEn: 'Gluteus Maximus',
-      category: 'muscle',
-      subcategory: '臀部の筋',
-      region: 'pelvis',
-      description: '臀部を形成する大きな筋。',
-      function: '股関節の伸展、立位・歩行の推進。',
-      isMajorPart: true,
-      color: MUSCLE,
-      pieces: [{ shape: 'sphere', args: [0.085], position: [-0.085, -0.095, -0.085], scale: [1.15, 1.05, 0.85] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'quadriceps',
-      nameJa: '大腿四頭筋',
-      nameEn: 'Quadriceps Femoris',
-      category: 'muscle',
-      subcategory: '大腿の筋',
-      region: 'leg',
-      description: '大腿前面の4つの筋の総称。',
-      function: '膝関節の伸展、股関節の屈曲。',
-      isMajorPart: true,
-      color: MUSCLE,
-      pieces: [{ shape: 'capsule', args: [0.058, 0.24], position: [-0.1, -0.32, 0.03] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'hamstrings',
-      nameJa: 'ハムストリングス',
-      nameEn: 'Hamstrings',
-      category: 'muscle',
-      subcategory: '大腿の筋',
-      region: 'leg',
-      description: '大腿後面の3つの筋の総称。',
-      function: '膝関節の屈曲、股関節の伸展。',
-      color: MUSCLE_DEEP,
-      pieces: [{ shape: 'capsule', args: [0.05, 0.24], position: [-0.1, -0.32, -0.045] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'tibialis_anterior',
-      nameJa: '前脛骨筋',
-      nameEn: 'Tibialis Anterior',
-      category: 'muscle',
-      subcategory: '下腿の筋',
-      region: 'leg',
-      description: 'すねの前外側にある筋。',
-      function: '足関節の背屈、足の内反。',
-      color: MUSCLE,
-      pieces: [{ shape: 'capsule', args: [0.028, 0.22], position: [-0.072, -0.7, 0.038] }],
-    }),
-  ),
-  ...makePair(
-    P({
-      id: 'gastrocnemius',
-      nameJa: '腓腹筋',
-      nameEn: 'Gastrocnemius',
-      category: 'muscle',
-      subcategory: '下腿の筋',
-      region: 'leg',
-      description: 'ふくらはぎを形成する筋。',
-      function: '足関節の底屈、歩行・跳躍の推進。',
-      isMajorPart: true,
-      color: MUSCLE,
-      pieces: [{ shape: 'capsule', args: [0.045, 0.19], position: [-0.1, -0.66, -0.045], scale: [1.05, 1.0, 1.1] }],
-    }),
-  ),
-];
+);
 
 // ============================================================================
 // 内臓

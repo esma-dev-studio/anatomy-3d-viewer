@@ -169,7 +169,8 @@ export function SkeletonModel() {
   const { scene } = useGLTF(SKELETON_URL, DRACO_PATH);
   const processed = useMemo(() => process(scene), [scene]);
 
-  const setSkeletonAnchors = useAnatomyStore((s) => s.setSkeletonAnchors);
+  const setPartAnchors = useAnatomyStore((s) => s.setPartAnchors);
+  const setModelFit = useAnatomyStore((s) => s.setModelFit);
   const selectPart = useAnatomyStore((s) => s.selectPart);
   const setHovered = useAnatomyStore((s) => s.setHovered);
 
@@ -179,10 +180,11 @@ export function SkeletonModel() {
   const hoveredId = useAnatomyStore((s) => s.hoveredPartId);
   const displayMode = useAnatomyStore((s) => s.displayMode);
 
-  // 読み込み完了時にアンカーを store へ登録
+  // 読み込み完了時にアンカーと共有変換を store へ登録
   useEffect(() => {
-    setSkeletonAnchors(processed.anchors);
-  }, [processed, setSkeletonAnchors]);
+    setPartAnchors(processed.anchors);
+    setModelFit(processed.fit);
+  }, [processed, setPartAnchors, setModelFit]);
 
   // 表示状態を反映
   useEffect(() => {

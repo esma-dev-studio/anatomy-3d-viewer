@@ -45,9 +45,11 @@ export interface AnatomyState {
   displayMode: DisplayMode;
   // --- カメラ命令(nonce で再発火) ---
   cameraCommand: { cmd: CameraCommand; nonce: number } | null;
-  // --- 実写骨格モデルの部位アンカー(ラベル/フォーカス位置。読み込み後に設定) ---
-  skeletonAnchors: Record<string, [number, number, number]>;
+  // --- 実写モデル(骨格・筋肉)の部位アンカー(ラベル/フォーカス位置。読み込み後に設定) ---
+  partAnchors: Record<string, [number, number, number]>;
   skeletonReady: boolean;
+  // 実写モデルを既定フレームへ整列させる共有変換(骨格が算出し筋肉も同じ変換を使う)
+  modelFit: { scale: number; position: [number, number, number]; rotationY: number } | null;
 
   // --- アクション ---
   toggleLayer: (cat: Category) => void;
@@ -69,7 +71,8 @@ export interface AnatomyState {
   zoomBy: (factor: number) => void;
   resetAll: () => void;
   // 実写骨格
-  setSkeletonAnchors: (anchors: Record<string, [number, number, number]>) => void;
+  setPartAnchors: (anchors: Record<string, [number, number, number]>) => void;
+  setModelFit: (fit: { scale: number; position: [number, number, number]; rotationY: number }) => void;
 }
 
 let cameraNonce = 0;
@@ -89,8 +92,9 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
   labelMode: 'none',
   displayMode: 'normal',
   cameraCommand: null,
-  skeletonAnchors: {},
+  partAnchors: {},
   skeletonReady: false,
+  modelFit: null,
 
   toggleLayer: (cat) =>
     set((s) => ({
@@ -133,7 +137,7 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
     const part = partsById[id];
     if (!part) return;
     // 実写骨格の部位はロード時に計算した実メッシュのアンカーを優先する。
-    const anchor = get().skeletonAnchors[id];
+    const anchor = get().partAnchors[id];
     const target = anchor ?? focusPointOf(part);
     // 部位の大きさに応じて寄り(フレーミング)を調整する。惑星クリックのように、
     // 小さい部位は近く、大きい部位は引いて全体が収まる距離にする。
@@ -159,7 +163,10 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
       displayMode: 'normal',
     }),
 
-  setSkeletonAnchors: (anchors) => set({ skeletonAnchors: anchors, skeletonReady: true }),
+  setPartAnchors: (anchors) =>
+    set((s) => ({ partAnchors: { ...s.partAnchors, ...anchors } })),
+
+  setModelFit: (fit) => set({ modelFit: fit, skeletonReady: true }),
 }));
 
 // ---------------------------------------------------------------------------
