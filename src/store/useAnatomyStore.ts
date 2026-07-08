@@ -81,6 +81,18 @@ function nextCamera(cmd: CameraCommand) {
   return { cmd, nonce: cameraNonce };
 }
 
+/** 選択中の部位が非表示になったら選択を解除する(詳細パネルに隠れた部位が残らないように) */
+function keepSelection(
+  id: string | null,
+  layerVisibility: Record<Category, boolean>,
+  partVisibility: Bool,
+): string | null {
+  if (!id) return null;
+  const part = partsById[id];
+  if (!part) return id;
+  return layerVisibility[part.category] && !!partVisibility[id] ? id : null;
+}
+
 export const useAnatomyStore = create<AnatomyState>((set, get) => ({
   layerVisibility: initialLayerVisibility,
   partVisibility: initialPartVisibility,
@@ -97,26 +109,34 @@ export const useAnatomyStore = create<AnatomyState>((set, get) => ({
   modelFit: null,
 
   toggleLayer: (cat) =>
-    set((s) => ({
-      layerVisibility: { ...s.layerVisibility, [cat]: !s.layerVisibility[cat] },
-    })),
+    set((s) => {
+      const layerVisibility = { ...s.layerVisibility, [cat]: !s.layerVisibility[cat] };
+      return { layerVisibility, selectedPartId: keepSelection(s.selectedPartId, layerVisibility, s.partVisibility) };
+    }),
 
   setLayerVisible: (cat, v) =>
-    set((s) => ({ layerVisibility: { ...s.layerVisibility, [cat]: v } })),
+    set((s) => {
+      const layerVisibility = { ...s.layerVisibility, [cat]: v };
+      return { layerVisibility, selectedPartId: keepSelection(s.selectedPartId, layerVisibility, s.partVisibility) };
+    }),
 
   togglePart: (id) =>
-    set((s) => ({
-      partVisibility: { ...s.partVisibility, [id]: !s.partVisibility[id] },
-    })),
+    set((s) => {
+      const partVisibility = { ...s.partVisibility, [id]: !s.partVisibility[id] };
+      return { partVisibility, selectedPartId: keepSelection(s.selectedPartId, s.layerVisibility, partVisibility) };
+    }),
 
   setPartVisible: (id, v) =>
-    set((s) => ({ partVisibility: { ...s.partVisibility, [id]: v } })),
+    set((s) => {
+      const partVisibility = { ...s.partVisibility, [id]: v };
+      return { partVisibility, selectedPartId: keepSelection(s.selectedPartId, s.layerVisibility, partVisibility) };
+    }),
 
   setCategoryPartsVisible: (cat, v) =>
     set((s) => {
       const next = { ...s.partVisibility };
       for (const p of anatomyParts) if (p.category === cat) next[p.id] = v;
-      return { partVisibility: next };
+      return { partVisibility: next, selectedPartId: keepSelection(s.selectedPartId, s.layerVisibility, next) };
     }),
 
   selectPart: (id, focus = false) => {
