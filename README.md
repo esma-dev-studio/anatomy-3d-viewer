@@ -43,13 +43,23 @@ Vite / React 18 / TypeScript / Three.js / React Three Fiber / drei / Zustand
 
 ## 3Dモデルについて
 
-MVP では外部アセットに依存せず、**プリミティブ（球・カプセル・円柱・箱・トーラス）を
-組み合わせたプロシージャルな人体モデル** を用いています。各部位は独立したメッシュ群
-として生成され、部位単位の表示切替・クリック選択・ハイライトが可能です。
+- **骨格**: 実写的な全身骨格の glTF（Draco圧縮・約1.6MB）を読み込みます
+  （[src/scenes/SkeletonModel.tsx](src/scenes/SkeletonModel.tsx)）。右半身＋体幹のモデルを
+  実行時にXミラーして全身化し、バウンディングボックスから中心・スケールを算出して
+  フレームに整列。144個の骨メッシュを [src/data/skeletonMap.ts](src/data/skeletonMap.ts) で
+  アプリの部位ID（頭蓋骨・脊椎・肋骨・骨盤・上腕骨…）へ対応づけ、選択/ハイライト/ラベル/
+  単独表示/カメラフォーカスをそのまま実メッシュに適用しています。
+- **筋肉・内臓・皮膚**: プリミティブ（球・カプセル等）による概略表示で、初期は非表示。
+  レイヤーで任意に重ねられます（実写メッシュへの置き換えは今後の課題）。
 
-将来的に、部位ごとにメッシュが分かれた glTF/GLB モデルへ差し替える場合は、
-`src/scenes/AnatomyModel.tsx` を GLTF ローダに置き換え、各 `AnatomyPart.meshId` と
-モデル内メッシュ名を対応づけてください。データ構造（`AnatomyPart`）はそのまま流用できます。
+Draco デコーダは CDN 非依存で `public/draco/` に同梱しています。
+
+### モデルのライセンス / 出典
+
+骨格3Dモデルは **BodyParts3D（© ライフサイエンス統合データベースセンター DBCLS）** に由来し、
+**Open3DModel（Leiden University Medical Center）** 経由で配布されているものを利用しています。
+ライセンスは **Creative Commons 表示-継承（CC BY-SA）** です。本アプリで当該モデルを
+再配布する場合も同ライセンス・出典表示が必要です。
 
 ## ディレクトリ構成
 
