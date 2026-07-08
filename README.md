@@ -55,9 +55,15 @@ Vite / React 18 / TypeScript / Three.js / React Three Fiber / drei / Zustand
   [src/data/muscleMap.ts](src/data/muscleMap.ts) で18の筋部位（三角筋・大胸筋・僧帽筋・広背筋・
   上腕二頭/三頭筋・前腕/手の筋・大殿筋・大腿四頭筋・ハムストリング・下腿三頭筋…）へ対応づけ。
   ※ 腹筋・頸部の筋は現状のデータに含まれないため未対応（整合する無償素材が別途必要）。初期は非表示。
-- **内臓・皮膚**: プリミティブ（球・カプセル等）による概略表示で、初期は非表示（実写化は今後）。
+- **内臓**: 実写的な内臓の glTF（`organs.glb`・約3MB）を読み込みます
+  （[src/scenes/OrganModel.tsx](src/scenes/OrganModel.tsx)）。脳・心臓・肺・肝臓・腎臓（左右）・
+  脾臓・膵臓・小腸・大腸・膀胱を、相互に整列した状態で胴体フレームへフィットさせ、臓器ごとに
+  色分け・選択できます。※ 胃は元データに含まれないため当面プリミティブ表示です。
+- **皮膚**: プリミティブによる半透明シェル。初期は非表示。
 
 Draco デコーダは CDN 非依存で `public/draco/` に同梱しています。
+
+内臓モデルは **HuBMAP Human Reference Atlas（Visible Human 由来, CC BY 4.0）** を利用しています。
 
 ### モデルのライセンス / 出典
 
