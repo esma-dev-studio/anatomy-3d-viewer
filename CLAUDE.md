@@ -11,6 +11,7 @@
 ## コマンド
 - `npm run dev`（開発サーバー）/ `npm run typecheck` / `npm run build`（tsc + vite build）
 - クラウドセッションでは起動時に `.claude/settings.json` のフックが `npm ci` を自動で実行する（`CLAUDE_CODE_REMOTE=true` のときだけ）。
+- クラウドでの見た目の確認: Chromium は `/opt/pw-browsers/` の下に入っている（2026-10-09 時点は `chromium-1194/chrome-linux/chrome`。`npx @puppeteer/browsers install` は通信制限で失敗する）。`npm run build` のあと `npx vite preview --host 127.0.0.1 --port 4173 --base /anatomy-3d-viewer/` で起動し（`--base` を付けないと404で真っ白になる）、`/tmp` に入れた puppeteer-core で `--no-sandbox --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist` を付けて撮る。
 
 ## Git
 - コミットの作者メールは noreply にする（個人メールだと GitHub が GH007 で push を拒否する）。コミット前に次を実行する。
