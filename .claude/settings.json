@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "[ \"$CLAUDE_CODE_REMOTE\" = \"true\" ] || exit 0; cd \"$CLAUDE_PROJECT_DIR\" || exit 0; [ -d node_modules ] && exit 0; npm ci --no-audit --no-fund",
+            "timeout": 300,
+            "statusMessage": "クラウド環境: npm ci で依存パッケージを入れています"
+          }
+        ]
+      }
+    ]
+  }
+}
